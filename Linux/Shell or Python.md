@@ -1,4 +1,4 @@
-# table of contents
+# 📕Table of contents 
 * [Shell Script VS Python Script](#shell-script-vs-python-script)
   * [What is Shell Scripting?](#what-is-shell-scripting)
   * [Is Python Programming a Scripting Language?](#is-python-programming-a-scripting-language)
