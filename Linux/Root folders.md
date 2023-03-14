@@ -1,0 +1,185 @@
+# 📖 Table of Contents
+  * [Root folders in Linux]()
+    * []() 
+    * []()
+  
+  * [Folders on Mac]()
+    * []()
+    * []() 
+# Root folders in Linux
+
+For more detailed technical information about the Linux file system hierarchy, consult the [Filesystem Hierarchy Standard documentation](http://www.pathname.com/fhs/pub/fhs-2.3.html).
+
+[linux directory structure explained](https://www.howtogeek.com/117435/htg-explains-the-linux-directory-structure-explained/)
+
+## / – The Root Directory
+
+**Everything on your Linux system is located under the / directory, known as the root directory**. You can think of the / directory as being similar to the C: directory on Windows – but this isn’t strictly true, as Linux doesn’t have drive letters. While another partition would be located at D: on Windows, this other partition would appear in another folder under / on Linux.
+
+![https://img.linux.net.cn/data/attachment/album/201807/02/094428ko2tc8saplc2apto.png](https://img.linux.net.cn/data/attachment/album/201807/02/094428ko2tc8saplc2apto.png)
+
+## /bin – Essential Binaries
+
+- [x]  essential
+- [x]  binary format(not text files)
+- [x]  executable(ready to run)
+
+The `/bin` folder contains programs that are essential for the system to boot and run. So, if you destroy this folder, your system won’t boot and run. These programs are stored in the binary format. In other words, they are not in text format. You cannot open and read the content of these programs. The advantage of such format is that a computer can read and execute these programs very fast.
+
+The `/bin` directory contains the essential user binaries (programs) that must be present when the system is mounted in single-user mode. Important system programs and utilities such as the bash shell are located in `/bin`, placing these files in the `/bin` directory ensures the system will have these important utilities even if no other file systems are mounted. The `/sbin` directory is similar – it contains essential system administration binaries.
+
+## /boot – Static Boot Files
+
+- [x]  Linux kernel
+- [x]  initial RAM disk image
+- [x]  boot loader(GRUB)
+
+It is easy to guess from the name. This folder is needed to boot your system. It contains the Linux kernel, initial RAM disk image for drives need at boot time, and the bootloader (GRUB). Within this boot folder, you can find the grub folder that contains grub configuration files.
+
+## /dev – Device Files
+
+- [x]  all devices represented here as file
+- [x]  /dev/sda1 (sda - name of a disk)
+
+Here, I need to introduce another important concept of Linux – everything is a file. The `/dev` folder contains files for all devices your Linux is able to recognize. Linux exposes devices as files, and the `/dev` directory contains a number of special files that represent devices. These are not actual files as we know them, but they appear as files – for example, `/dev/sda` represents the first SATA drive in the system. If you wanted to partition it, you could start a partition editor and tell it to edit `/dev/sda`.
+
+This directory also contains pseudo-devices, which are virtual devices that don’t actually correspond to hardware. For example, `/dev/random` produces random numbers. `/dev/null` is a special device that produces no output and automatically discards all input – when you pipe the output of a command to `/dev/null`, you discard it.
+
+## /etc – Configuration Files
+
+- [x]  system-wide configuration files
+- [x]  some are executed during system boot
+
+The `/etc` directory contains configuration files, which can generally be edited by hand in a text editor, which means that they are all human readable. If you ever did any system-wide configuration, you probably edited some files here. Note that the `/etc` directory contains system-wide configuration files. However, user-specific configuration files are located in each user’s home directory.
+
+## /home – Home Folders
+
+- [x]  where user save their private data, each user has his own folder
+
+The `/home` directory contains a home folder for each user. For example, if your user name is bob, you have a home folder located at `/home/bob`. This home folder contains the user’s data files and user-specific configuration files. Each user only has write access to their own home folder and must obtain elevated permissions (become the root user) to modify other files on the system.
+
+## /lib – Essential Shared Libraries
+
+- [x]  libraries required by programs in /bin and /sbin
+
+The `/lib` directory contains libraries needed by the essential binaries in the `/bin` and `/sbin` folder. Libraries needed by the binaries in the `/usr/bin` folder are located in `/usr/lib`.
+
+## /lost+found – Recovered Files
+
+- [x]  recovery folder used by the ext4 file system
+- [x]  separate for every ext4 partion
+
+You will have this directory if you use the *ext4* file system. Most of the modern Linux distros use *ext4*, so most likely you have this folder. This is a file system specific folder that is used for data recovery in case of file corruption. Any corrupted files found will be placed in the lost+found directory, so you can attempt to recover as much data as possible.
+
+Unless something bad has happened, this folder should be empty on your system. This `/lost+found` folder is produced on every separate partition. So, if your `/home` folder is on a separate partition, you should have this `/lost+found` folder in your home directory too.
+
+## /media – Removable Media
+
+- [x]  automatic mounting of removable media such as USB drives, CD-ROM etc.
+
+This folder is used for automatic mounting of removable media such as USB drives, CD-ROM etc. For example, if your system is configured for automatic mounting, when you insert a USB drive it will be mounted to this folder.
+
+The `/media` directory contains subdirectories where removable media devices inserted into the computer are mounted. For example, when you insert a CD into your Linux system, a directory will automatically be created inside the `/media` directory. You can access the contents of the CD inside this directory.
+
+## /mnt – Temporary Mount devices
+
+- [x]  similar with /media folder, but it is usually used for manual mounting
+
+The `/mnt` folder is similar to the `/media` folder, it is also used to mount devices, but usually, it is used for manual mounting. You, of course, can manually mount your devices to `/media`, but to keep some order in your system it is better to separate these two mounting points.
+
+Historically speaking, the `/mnt` directory is where system administrators mounted temporary file systems while using them. For example, if you’re mounting a Windows partition to perform some file recovery operations, you might mount it at `/mnt/windows`. However, you can mount other file systems anywhere on the system.
+
+## /opt – Optional Packages
+
+- [x]  not essential commercial programs(e.g. Dropbox)
+
+This folder is not essential for your system to work. Usually, it is used to install commercial programs on your system. For example, my *Dropbox* installation is located in this folder.
+
+The `/opt` directory contains subdirectories for optional software packages. It’s commonly used by proprietary software that doesn’t obey the standard file system hierarchy – for example, a proprietary program might dump its files in `/opt/application` when you install it.
+
+## /proc – Kernel & Process Files
+
+- [x]  virtual file-system for the Linux kernel
+- [x]  Don’t touch by user
+
+The `/proc` directory similar to the `/dev` directory because it doesn’t contain standard files. It contains special files that represent system and process information. This is a virtual file-system maintained by the Linux kernel. Usually, you do not touch anything in this folder. It is needed only for the kernel to run different processes.
+
+## /root – Home Directory for the root user
+
+- [x]  the same as your user home directory but it is for root account
+
+The `/root` directory is the home directory of the root user. Instead of being located at `/home/root`, it’s located at `/root`. This is distinct from `/`, which is the system root directory. If you log in as a root, you will be located in this directory by default. This is a folder for private data and account specific setting of your root account.
+
+## /run – Early temp
+
+- [x]  used early in system boot
+- [x]  temporary file-system
+
+The `/run` is a recently introduced folder that is actually a temporary file-system. It is used to store temporary files very early in system boot before the other temporary folders become available.
+
+The `/run` directory is fairly new, and gives applications a standard place to store transient(暂时的) files they require like sockets and process IDs. These files can’t be stored in `/tmp` because files in `/tmp` may be deleted.
+
+## /sbin – System Administration Binaries
+
+- [x]  binaries
+- [x]  essential
+- [x]  run by the super user
+
+The `/sbin` directory is similar to the /bin directory. It contains essential binaries that are generally intended to be run by the root user for system administration.
+
+## /srv – Service Data
+
+- [x]  service files installed on your system
+
+This directory contains service files installed on your system. For example, if you installed a web-served on your Linux system, it will be located in this folder.
+
+The `/srv` directory contains “data for services provided by the system.” If you were using the Apache HTTP server to serve a website, you’d likely store your website’s files in a directory inside the `/srv` directory.
+
+## /tmp – Temporary Files
+
+- [x]  temporary files
+
+Applications store temporary files in the `/tmp` directory. These files are generally deleted whenever your system is restarted and may be deleted at any time by utilities such as tmpwatch.
+
+## /usr – User Binaries
+
+- [x]  user binaries
+- [x]  /usr/bin /usr/lib /usr/local /usr/share
+
+This is probably the largest folder after your home folder. It contains all programs used by a regular user. The `/usr` directory contains applications and files used by users, as opposed to applications and files used by the system.
+
+`/usr/bin` contains the programs installed by your Linux distribution. There are usually thousands of programs here. The libraries for this `/usr/bin` executables are located in the `/usr/lib` folder. The `/usr/local` directory is where locally compiled applications install to by default – this prevents them from mucking up the rest of the system.The most useful folder is `/usr/share`. It contains all the shared data used by the programs from `/usr/bin`.
+
+## /var – Variable Data Files
+
+- [x]  variable files
+
+The `/var` contains files that are of variable content, so their content is not static and it constantly changes. For example, this is **where the log files are stored**. If you don’t know, a log file is a file that records all events happening in your system while it is running. These log files often help to find out if something is not working correctly in your system.
+
+# Folders that come with your Mac
+
+macOS organizes items on your Mac in folders. You can see all of the folders in the [Finder](https://support.apple.com/guide/mac-help/aside/glos00063759/11.0/mac/11.0). Many folders you regularly use are in the [Finder sidebar](https://support.apple.com/guide/mac-help/aside/glos200755a1/11.0/mac/11.0).
+
+**Important:** Your home folder and certain other folders can’t be renamed. It’s best not to rename or move folders that came with your Mac. Many of these folders have special uses and are necessary for your Mac to function correctly.
+
+## Applications
+
+This folder contains apps, including Mail, Calendar, Safari, and many others. Apps in this folder also [appear in Launchpad](https://support.apple.com/guide/mac-help/open-apps-with-launchpad-mh35840/11.0/mac/11.0). If you try to drag an app out of the Applications folder, it isn’t moved; instead, an [alias](https://support.apple.com/guide/mac-help/aside/glos3c6968d0/11.0/mac/11.0) is created. If you want to uninstall an app, see [Install and uninstall apps](https://support.apple.com/guide/mac-help/install-and-uninstall-other-apps-mh35835/11.0/mac/11.0).
+
+## Library
+
+This folder contains fonts and other items used by apps that are available to all users of your Mac. Don’t use this folder to store files and folders you create. Instead, use the [home folder](https://support.apple.com/guide/mac-help/aside/glos7dad3d40/11.0/mac/11.0), the Desktop folder, the Documents folder, or iCloud Drive.
+
+## System
+
+This folder contains the macOS operating system. You can’t change the name or location of the System folder or the items within it.
+
+## Users
+
+This folder contains the home folders of all the people [set up as users on your Mac](https://support.apple.com/guide/mac-help/set-up-other-users-on-your-mac-mtusr001/11.0/mac/11.0). When you’re logged in, the icon for your home folder looks like a folder with a house on it, and the other home folders look like regular folders. If you log out and someone else logs in, that person’s home folder then looks like a house. The Users folder also contains the Shared folder. Items in the Shared folder are available to anyone who uses your Mac.
+
+## Home
+
+Your home folder is named with your user name and has folders for your desktop files, downloads, pictures, documents, movies, music, and any public files. You can [create folders](https://support.apple.com/guide/mac-help/organize-files-using-folders-mh26885/11.0/mac/11.0) in your home folder.
+
+Additionally, you can create folders in your iCloud Drive folder, the Documents folder, or on the desktop (on your Mac or in iCloud Desktop and Documents) to organize your files. There are certain locations where you may not be able to create additional folders.
