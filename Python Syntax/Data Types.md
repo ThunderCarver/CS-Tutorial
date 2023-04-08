@@ -1,0 +1,248 @@
+# 1.Data Types
+
+[toc]
+
+# [Data Types](https://www.codesdope.com/course/python-data-types/)
+
+The different types of data like an integer and a text are not the same for us and neither for Python or a computer. In fact, different types of data also need a different amount of space to get stored in memory. For example, the amount of memory needed to store a text value and an integer value is different. Thus, Python has different built-in **data types** to handle different data. We will look at those different types of data in this chapter.
+
+## Tools:
+
+Python provides a function `type()` to get the type of any data.
+
+Python also provides a function `id()` to get the address of any data in memory.
+
+Python also provides an operator `is` to check if two variables are located in the same memory. `a is b`
+
+## Data Types
+
+### 1.number `math.ceil(向上取整)` `math.floor(向下取整)` `math.trunc(去掉小数部分)`
+
+Numbers consist of all the numeric values. Numbers in Python are classified into the following data types.
+
+- **int** - Integers don’t have decimal and can have any length as long as the required memory is available. For example, 3, 855, etc.
+- **float** - Floating point numbers are the ones having decimal. For example, 2.564728.
+    - Precision Handling in Python [reference](https://www.geeksforgeeks.org/precision-handling-python/)
+        
+        Python in its definition allows to handle precision of floating point numbers in several ways using different functions. Most of them are defined under the “**math**” module. Some of the most used operations are discussed in this article.
+        
+        **1. math.trunc() :-** This function is used to **eliminate all decimal part** of the floating point number and return the integer without the decimal part.
+        
+        **2. math.ceil() :-** This function is used to print the **least integer greater than the given number**.
+        
+        **3. math.floor() :-** This function is used to print the **greatest integer smaller than the given integer**.
+        
+        **Setting Precision** [浮点数精度显示控制](./13.String%20Formatting.md#Formatted%20String%20Literal%20(f-String))
+        
+        There are many ways to set precision of floating point value. Some of them is discussed below.
+        
+        **1. Using “%”** :- “%” operator is used to format as well as set precision in python. This is similar to “printf” statement in [C programming](https://www.geeksforgeeks.org/c/).
+        
+        **2. Using format() :-** This is yet another way to format the string for setting precision.
+        
+        **3. Using round(x,n) :-** This function takes 2 arguments, **number and the number till which we want decimal part rounded.**
+        
+        ```python
+        # Python code to demonstrate precisiona = 3.4536# using format() to print value till 2 decimal placesprint ("{0:.2f}".format(a))                     # 3.45# using round() to print value till 2 decimal placesprint (round(a,2))                                      # 3.45
+        ```
+        
+- **complex** - Complex numbers, as in Mathematics, have the form `a + bj`, where `a` is the real part and `b` is the imaginary part. For example, 2 + 3j, 6j. *Must use `j` as imaginary part, `i` is an error*.
+    
+    ```python
+    a = 56print(a, "has a type", type(a))                 # a has a type intb = 56.48print(b, "has a type", type(b))                 # b has a type floatc = 5 + 6jprint(c, "has a type", type(c))                 # c has a type complex
+    ```
+    
+
+### 2.boolean
+
+A Boolean data type consists of two values - `True` and `False`. These two values are also the keywords reserved by Python.
+
+```python
+print(True, "has a type", type(True))                       # True has a type <class 'bool'>print(False, "has a type", type(False))                 # False has a type <class 'bool'>
+```
+
+We can see that the type of `True` and `False` is `bool` (bool is for Boolean).
+
+### 3.String
+
+String is a collection of characters. In simple English, it is a letter, word, sentence or a collection of sentences. For now, just understand that a string is a collection of characters and these are written within `' '` or `" "`.
+
+```python
+print("Hello World", "has a type", type("Hello World"))# Hello World has a type <class 'str'>print('Hello World', "has a type", type('Hello World'))# Hello World has a type <class 'str'>print('word', "has a type", type('word')) # word has a type <class 'str'>print('a', "has a type", type('a'))             # a has a type <class 'str'>print('@', "has a type", type('@'))             # @ has a type <class 'str'>print('23', "has a type", type('23'))           # 23 has a type <class 'str'>
+```
+
+Note that anything written within `' '` or `" "` is a string. In the above example, ‘@’ and ‘23’ are also of type `str` (str is for String).
+
+Look at another example.
+
+```python
+a = "23"print(a, "has type", type(a))           # 23 has type <class 'str'>b = 23print(b, "has type", type(b))           # 23 has type <class 'int'>
+```
+
+You can see that the data type of the value assigned to `a` is str because it is written within `""`.
+
+> Even a digit written within ' ' or " " is treated as a string and not as an integer or a float. For example, print(type("8")) will give us <class 'str'>.
+> 
+
+---
+
+> There are other data types like list, tuple, dictionary and set which are used to store a collection of data rather than a single data. You will learn about them in detail in later chapters. Here, we are just going to show you how to declare them and check their data type.
+> 
+
+### 4.List – (mutable)
+
+A list is a collection of items.
+
+The items in a list are enclosed within brackets `[ ]` and separated by commas.
+
+```python
+a = [2, "Hello", True, 100, 2]print(a, "has type", type(a))           # [2, "Hello", True, 100, 2] has type list
+```
+
+### 5.Tuple – (immutable)
+
+Tuples are the same as lists. The difference is that tuples are ***immutable[不可修改]*** while ***lists are not***. This means that ==once tuples are created, they cannot be modified==.
+
+The items in a tuple are enclosed within parentheses `( )` and separated by commas.
+
+```python
+a = (2, "Hello", True, 100, 2)print(a, "has a type", type(a))         # (2, "Hello", True, 100, 2) has a type  <class 'tuple'>
+```
+
+### 6.Dictionary
+
+A dictionary is a collection of data in the form of key-value pairs. It can be understood as a mapping structure where keys are mapped to values.
+
+![https://www.codesdope.com/pa-images-bucket/courses/python/d2.jpg](https://www.codesdope.com/pa-images-bucket/courses/python/d2.jpg)
+
+Here, the dictionary has three items -
+
+```
+'mango':40
+```
+
+,
+
+```
+'banana':10
+```
+
+and,
+
+```
+'cherry':20
+```
+
+In the first item, the key is `mango` and the value is 40. Similarly, there is a key-value pair in the other two items as well.
+
+```python
+fruit = {'mango':40,'banana':10,'cherry':20}print(fruit, "has type", type(fruit))       # {'mango':40,'banana':10,'cherry':20} has type dict
+```
+
+### 7.Set
+
+A set is an unordered collection of **unique and immutable items and 不可索引**. This means that the items in a set cannot be repeated and cannot be changed after the set is created. We can also perform mathematical operations like union, intersection, etc., with sets.
+
+The items in a set are enclosed within braces `{ }` and separated by commas.
+
+```python
+a = {1, 2, 3, -1, -2, 0, 1, 2, 3}   # a = {-2, -1, 0, 1, 2, 3}print(a, "has type", type(a))               # a has type set
+```
+
+## Type Conversion
+
+Suppose we are writing some code and we have a variable having a value 10 (an integer) and at some point of time we want it to be a string i.e., “10”. Or a more practical case would be to convert a float (10.2) to an integer (10). We can easily do so in Python. Let’s see how.Python provides a list of functions for converting from one data type to another.
+
+### convert a value into an int. 小数如果以字符串形式给出则无法完成转换
+
+- Floating point numbers can be converted to integer.
+    
+    ```python
+    int(4.6)                # 4
+    ```
+    
+    > </> Floating point number (4.6) is converted to int (4). Notice that 4.6 is not rounded off to 5, but the highest integer less than or equal to 4.6 is returned.
+    > 
+- If a Boolean value is converted into an int, then `True` returns `1` and False returns `0`.
+    
+    ```python
+    print(int(True))                # 1print(int(False))               # 0
+    ```
+    
+- **If a string consists of only numbers, then it can be converted into an integer.**
+    
+    ```python
+    print(int("10"))                # 10
+    ```
+    
+- **However, if a string consists of some non-numeric value, then it will throw an error on converting it to integer.**
+    
+    ```python
+    print(int("Hello22"))       # ValueError: invalid literal for int() with base 10print(int("5.2"))               # ValueError: invalid literal for int() with base 10
+    ```
+    
+
+### convert a value into a float.
+
+- Integers can be converted to float.
+    
+    ```python
+    print(float(46))                # 46.0
+    ```
+    
+- If a Boolean value is converted into a float, then `True` returns `1.0` and `False` returns `0.0`.
+    
+    ```python
+    print(float(True))          # 1.0print(float(False))         # 0.0
+    ```
+    
+- If a string consists of only numbers, then it can be converted into a float.
+    
+    ```python
+    print(float("10"))    # 10.0print(float("4.6"))     # 4.6
+    ```
+    
+- However, if a string consists of some non-numeric value, then it will throw an error on converting it to float.
+    
+    ```python
+    print(float("Hello"))  # in ValueError: could not convert string to float: hello
+    ```
+    
+
+### convert a value into a string.
+
+Python can convert numbers, boolean values and also list, tuples, dictionaries and tuples into strings.
+
+```python
+str(46)                                                 # '46'str(4.6)                                                # '4.6'str(True)                                               # 'True'str([1, 2, 3, 4])                               # '[1, 2, 3, 4]'str({'a':'1','b':'2'})                  # '{'a':'1','b':'2'}'
+```
+
+### convert a value into a boolean
+
+If a non-zero value is passed to the `bool()` function, then it returns `True`. Otherwise, if a null value (0, 0.0, etc), a False value (value or expression equivalent to False), None or an empty sequence or mapping ([ ], { }, ( ), etc) is passed to the function, then it returns `False`.
+
+```python
+print(bool(0.5))                    # Trueprint(bool(-4))                     # Trueprint(bool(True))                   # Trueprint(bool(False))              # Falseprint(bool(0.0))                    # Falseprint(bool(None))                   # Falseprint(bool("Hello"))            # Trueprint(bool([ ]))                    # Falseprint(bool([[],[]]))            # True
+```
+
+### other convert
+
+==Apart from these functions, there are functions list(), tuple(), dict() and set() to convert values to list, tuple, dictionary and set respectively which we will cover in their respective chapters.==
+
+## isinstance()
+
+`isinstance()` is used to check if an object belongs to a particular class.
+
+```python
+print(type(10))         # <class 'int'>
+```
+
+In the above example, we can see that the data type of 10 is *int*.
+
+However, you must be wondering why we are getting the type as `class 'int'`. What is the significance of ‘class’?
+
+In Python, data types are predefined classes and variables/values are the objects of these classes. Therefore, in the above example, int is a class and *10* is an object of *int*. Similarly, str is a class and “*Hello World*” is an object which belongs to the class *str*, list is a class and *[1, 2, 3]* is an object which belongs to the class list, and so on.
+
+```python
+a = 3print(isinstance(a, float))                 # Falseb = "Python"print(isinstance(b, str))                       # Truec = Trueprint(isinstance(c, bool))                  # Trueimport numpy as npa=np.empty(2)isinstance(a,np.ndarray)                        # True
+```
