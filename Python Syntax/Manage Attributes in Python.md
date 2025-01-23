@@ -2,7 +2,16 @@
 * [Getting to Know Getter and Setter Methods](#getting-to-know-getter-and-setter-methods)
   * [What Are Getter and Setter Methods?](#what-are-getter-and-setter-methods)
   * [Where Do Getter and Setter Methods Come From?](#where-do-getter-and-setter-methods-come-from)
-* [Using Properties Instead of Getters and Setters: The Python Way]()
+* [Using Properties Instead of Getters and Setters: The Python Way](#using-properties-instead-of-getters-and-setters-the-python-way)
+* [Replacing Getters and Setters With More Advanced Tools](#replacing-getters-and-setters-with-more-advanced-tools)
+  * [Python’s Descriptors](#pythons-descriptors)
+  * [The .__setattr__() and .__getattr__() Methods](#the-setattr-and-getattr-methods)
+* [Deciding Whether to Use Getters and Setters or Properties in Python](#deciding-whether-to-use-getters-and-setters-or-properties-in-python)
+  * [Avoiding Slow Methods Behind Properties](#avoiding-slow-methods-behind-properties)
+  * [Taking Extra Arguments and Flags](#taking-extra-arguments-and-flags)
+  * [Using Inheritance: Getter and Setters vs Properties](#using-inheritance-getter-and-setters-vs-properties)
+  * [Raising Exceptions on Attribute Access or Mutation](#raising-exceptions-on-attribute-access-or-mutation)
+  * [Facilitating Team Integration and Project Migration](#facilitating-team-integration-and-project-migration) 
 * [Conclusion](#conclusion)
 
 
@@ -245,6 +254,295 @@ Because of properties, Python developers tend to design their classes’ APIs us
 * **Avoid side effects** in properties because no one would expect operations like assignments to cause any side effects.
 
 Python’s properties are cool! Because of that, people tend to overuse them. In general, you should only use properties when you need to add extra processing on top of a specific attribute. Turning all your attributes into properties will be a waste of your time. It may also imply performance and maintainability issues.
+
+## Replacing Getters and Setters With More Advanced Tools
+Up to this point, you’ve learned how to create bare-bones getter and setter methods to manage the attributes of your classes. You’ve also learned that properties are the Pythonic way to approach the problem of adding functional behavior to existing attributes.
+
+In the following sections, you’ll learn about other tools and techniques that you can use to replace getter and setter methods in Python.
+
+### Python’s Descriptors
+Descriptors are an advanced Python feature that allows you to create attributes with attached behaviors in your classes. To create a descriptor, you need to use the descriptor protocol, especially the .__get__() and .__set__() special methods.
+
+Descriptors are pretty similar to properties. In fact, a property is a special type of descriptor. However, regular descriptors are more powerful than properties and can be reused through different classes.
+
+To illustrate how to use descriptors to create attributes with functional behavior, say that you need to continue developing your Employee class. This time, you need an attribute to store the date on which an employee started to work for the company:
+```python
+from datetime import date
+
+class Employee:
+    def __init__(self, name, birth_date, start_date):
+        self.name = name
+        self.birth_date = birth_date
+        self.start_date = start_date
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value.upper()
+
+    @property
+    def birth_date(self):
+        return self._birth_date
+
+    @birth_date.setter
+    def birth_date(self, value):
+        self._birth_date = date.fromisoformat(value)
+
+    @property
+    def start_date(self):
+        return self._start_date
+
+    @start_date.setter
+    def start_date(self, value):
+        self._start_date = date.fromisoformat(value)
+```
+In this update, you added another property to Employee. This new property will allow you to manage the start date of each employee. Again, the setter method converts the date from a string to a date object.
+
+This class works as expected. However, it starts to look repetitive and boring. So, you decide to refactor the class. You notice that you’re doing the same operation in both date-related attributes, and you think of using a descriptor to pack the repetitive functionality:
+```python
+from datetime import date
+
+class Date:
+    def __set_name__(self, owner, name):
+        self._name = name
+
+    def __get__(self, instance, owner):
+        return instance.__dict__[self._name]
+
+    def __set__(self, instance, value):
+        instance.__dict__[self._name] = date.fromisoformat(value)
+
+class Employee:
+    birth_date = Date()
+    start_date = Date()
+
+    def __init__(self, name, birth_date, start_date):
+        self.name = name
+        self.birth_date = birth_date
+        self.start_date = start_date
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value.upper()
+```
+This code is cleaner and less repetitive than its previous version. In this update, you create a Date descriptor to manage date-related attributes. The descriptor has a .__set_name__() method that automatically stores the attribute name. It also has .__get__() and .__set__() methods that work as the attribute’s getter and setter, respectively.
+
+The two implementations of Employee in this section work similarly. Go ahead and give them a try!
+
+In general, if you find yourself cluttering your classes with similar property definitions, then you should consider using a descriptor instead.
+
+### The .__setattr__() and .__getattr__() Methods
+Another way to replace traditional getter and setter methods in Python is to use the .__setattr__() and .__getattr__() special methods to manage your attributes. Consider the following example, which defines a Point class. The class automatically converts the input coordinates into floating-point numbers:
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __getattr__(self, name: str):
+        return self.__dict__[f"_{name}"]
+
+    def __setattr__(self, name, value):
+        self.__dict__[f"_{name}"] = float(value)
+```
+The initializer of Point takes two coordinates, x and y. The .__getattr__() method returns the coordinate represented by name. To do this, the method uses the instance namespace dictionary, .__dict__. Note that the attribute’s final name will have an underscore preceding whatever you pass in name. Python automatically calls .__getattr__() whenever you access an attribute of Point using the dot notation.
+
+The .__setattr__() method adds or updates attributes. In this example, .__setattr__() operates on each coordinate and converts it into a floating-point number using the built-in float() function. Again, Python calls .__setattr__() whenever you run an assignment operation on any attribute of the containing class.
+
+Here’s how this class works in practice:
+```python
+>>> from point import Point
+
+>>> point = Point(21, 42)
+
+>>> point.x
+21.0
+>>> point.y
+42.0
+
+>>> point.x = 84
+>>> point.x
+84.0
+
+>>> dir(point)
+['__class__', '__delattr__', ..., '_x', '_y']
+```
+Your Point class automatically converts coordinate values into floating-point numbers. You can access the coordinates, x and y, as you would any other regular attribute. However, access and mutation operations go through .__getattr__() and .__setattr__(), respectively.
+
+Note that Point allows you to access the coordinates as public attributes. However, it stores them as non-public attributes. You can confirm this behavior with the built-in dir() function.
+
+The example in this section is a bit exotic, and you probably won’t use something similar in your code. However, the tools that you’ve used in the example allow you to perform validations or transformations on attribute access and mutation, just like getter and setter methods do.
+
+In a sense, .__getattr__() and .__setattr__() are kind of a generic implementation of the getter and setter pattern. Under the hood, these methods work as getters and setters that support regular attribute access and mutation in Python.
+
+## Deciding Whether to Use Getters and Setters or Properties in Python
+In real-world coding, you’ll find a few use cases where getter and setter methods can be preferred over properties, even though properties are generally the Pythonic way to go.
+
+For example, getter and setter methods may be better suited to deal with situations in which you need to:
+
+* Run costly transformations on attribute access or mutation
+* Take extra arguments and flags
+* Use inheritance
+* Raise exceptions related to attribute access and mutation
+* Facilitate integration in heterogeneous development teams
+In the following sections, you’ll dive into these use cases and why getter and setter methods can be better than properties to approach such cases.
+
+### Avoiding Slow Methods Behind Properties
+You should avoid hiding slow operations behind a Python property. The users of your APIs will expect attribute access and mutation to perform like regular variable access and mutation. In other words, users will expect these operations to happen instantaneously and without side effects.
+
+Going too far away from that expectation will make your API odd and unpleasant to use, violating the least surprise principle.
+
+Additionally, if your users repeatedly access and mutate your attributes in a loop, then their code can involve too much overhead, which may produce huge and unexpected performance issues.
+
+In contrast, traditional getter and setter methods make it explicit that accessing or mutating a given attribute happens through a method call. Indeed, your users will be aware that calling a method can take time, and the performance of their code can vary significantly because of that.
+
+Making such facts explicit in your APIs can help minimize your users’ surprise when they access and mutate your attributes in their code.
+
+In short, if you’re going to use a property to manage an attribute, then make sure that the methods behind the property are fast and don’t cause side effects. In contrast, if you’re dealing with slow accessor and mutator methods, then favor traditional getters and setters over properties.
+
+### Taking Extra Arguments and Flags
+Unlike Python properties, traditional getter and setter methods allow for more flexible attribute access and mutation. For example, say you have a Person class with a .birth_date attribute. This attribute should be constant during a person’s lifetime. Therefore, you decide that the attribute will be read-only.
+
+However, because human error exists, you’ll face cases in which someone makes a mistake when entering the date of birth of a given person. You can solve this problem by providing a setter method that takes a force flag, like in the example below:
+```python
+class Person:
+    def __init__(self, name, birth_date):
+        self.name = name
+        self._birth_date = birth_date
+
+    def get_birth_date(self):
+        return self._birth_date
+
+    def set_birth_date(self, value, force=False):
+        if force:
+            self._birth_date = value
+        else:
+            raise AttributeError("can't set birth_date")
+```
+You provide traditional getter and setter methods for the .birth_date attribute in this example. The setter method takes an extra argument called force, which allows you to force the modification of a person’s date of birth.
+<blockquote>Note: Traditional setter methods typically don’t take more than one argument. The example above may look odd or even incorrect to some developers. However, its intention is to showcase a technique that can be useful in some situations.</blockquote>
+
+Here’s how this class works:
+```python
+>>> from person import Person
+
+>>> jane = Person("Jane Doe", "2000-11-29")
+>>> jane.name
+'Jane Doe'
+
+>>> jane.get_birth_date()
+'2000-11-29'
+
+>>> jane.set_birth_date("2000-10-29")
+Traceback (most recent call last):
+    ...
+AttributeError: can't set birth_date
+
+>>> jane.set_birth_date("2000-10-29", force=True)
+>>> jane.get_birth_date()
+'2000-10-29'
+```
+When you try to modify Jane’s date of birth using .set_birth_date() without setting force to True, you get an AttributeError signaling that the attribute can’t be set. In contrast, if you set force to True, then you’ll be able to update Jane’s date of birth to correct any errors that occurred when the date was entered.
+
+It’s important to note that Python properties don’t accept extra arguments in their setter methods. They just accept the value to be set or updated.
+
+### Using Inheritance: Getter and Setters vs Properties
+One issue with Python properties is that they don’t do well in inheritance scenarios. For example, say that you need to extend or modify the getter method of a property in a subclass. In practice, there’s no safe way to do this. You can’t just override the getter method and expect the rest of the property’s functionality to remain the same as in the parent class.
+
+This issue occurs because the getter and setter methods are hidden inside the property. They’re not inherited independently but as a whole. Therefore, when you override the getter method of a property inherited from a parent class, you override the whole property, including its setter method and the rest of its internal components.
+As an example, consider the following class hierarchy:
+```python
+class Person:
+    def __init__(self, name):
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, value):
+        self._name = value
+
+class Employee(Person):
+    @property
+    def name(self):
+        return super().name.upper()
+```
+In this example, you override the getter method of the .name property in Employee. This way, you’re implicitly overriding the whole .name property, including its setter functionality:
+```python
+>>> from person import Employee
+
+>>> jane = Employee("Jane")
+
+>>> jane.name
+'JANE'
+
+>>> jane.name = "Jane Doe"
+Traceback (most recent call last):
+    ...
+AttributeError: can't set attribute 'name'
+```
+Now .name is a read-only property because the setter method of the parent class wasn’t inherited but was overridden by a completely new property. You don’t want that, do you? How can you solve this inheritance issue?
+
+If you use traditional getter and setter methods, then the issue won’t happen:
+```python
+class Person:
+    def __init__(self, name):
+        self._name = name
+
+    def get_name(self):
+        return self._name
+
+    def set_name(self, value):
+        self._name = value
+
+class Employee(Person):
+    def get_name(self):
+        return super().get_name().upper()
+```
+This version of Person provides independent getter and setter methods. Employee subclasses Person, overriding the getter method for the name attribute. This fact doesn’t affect the setter method, which Employee successfully inherits from its parent class, Person.
+
+Here’s how this new version of Employee works:
+```python
+>>> from person import Employee
+
+>>> jane = Employee("Jane")
+
+>>> jane.get_name()
+'JANE'
+
+>>> jane.set_name("Jane Doe")
+>>> jane.get_name()
+'JANE DOE'
+```
+Now Employee is completely functional. The overridden getter method works as expected. The setter method also works because it was successfully inherited from Person.
+
+### Raising Exceptions on Attribute Access or Mutation
+Most of the time, you won’t expect an assignment statement like obj.attribute = value to raise an exception. In contrast, you can expect methods to raise exceptions in response to errors. In this regard, traditional getter and setter methods are more explicit than properties.
+
+For example, site.url = "123" doesn’t look like something that can raise an exception. It looks and should behave like a regular attribute assignment. On the other hand, site.set_url("123") does look like something that can raise an exception, perhaps a ValueError, because the input value isn’t a valid URL for a website. In this example, the setter method is more explicit. It clearly expresses the code’s possible behavior.
+
+As a rule of thumb, avoid raising exceptions from your Python properties unless you’re using a property to provide read-only attributes. If you ever need to raise exceptions on attribute access or mutation, then you should consider using getter and setter methods instead of properties.
+
+In these cases, using getters and setters will reduce the user’s surprise and make your code more aligned with common practices and expectations.
+### Facilitating Team Integration and Project Migration
+Providing getter and setter methods is common practice in many well-established programming languages. If you’re working on a Python project with a team of developers who come from other language backgrounds, then it’s pretty likely that the getter and setter pattern will look more familiar to them than Python properties.
+
+In this type of heterogeneous team, using getters and setters can facilitate the integration of new developers into the team.
+
+Using the getter and setter pattern can also promote API consistency. It allows you to provide an API based on method calls rather than an API that combines method calls with direct attribute access and mutation.
+
+Often, when a Python project grows, you may need to migrate the project from Python to another language. The new language may not have properties, or they may not behave as Python properties do. In these situations, using traditional getters and setters from the beginning would make future migrations less painful.
+
+In all of the above situations, you should consider using traditional getter and setter methods instead of properties in Python.
 
 ## Conclusion
 Now you know what getter and setter methods are and where they come from. These methods allow access and mutation of attributes 
