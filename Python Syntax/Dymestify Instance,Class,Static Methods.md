@@ -153,7 +153,7 @@ Pizza(['cheese', 'tomatoes', 'garlic'])
 Pizza(['tomatoes', 'garlic'])
 ```
 
-So, when should you use instance methods? In short, you should use instance methods when you need to access and edit the data that an instance of your class holds.
+So, when should you use instance methods? **In short, you should use instance methods when you need to access and edit the data that an instance of your class holds**.
 
 ### When to use Class Methods
 
@@ -176,8 +176,66 @@ class Pizza:
 
 Note how the `.margherita()` and `.prosciutto()` factory methods use the `cls` argument instead of calling the `Pizza` constructor directly.
 
-You can use the factory methods to create new Pizza objects that are configured the way you want them. They all use the same `.__init__()` constructor internally and simply provide a shortcut for remembering the various toppings.
+You can use the factory methods to create new Pizza objects that are configured the way you want them. They all use the same `.__init__()` constructor internally and simply provide a shortcut for remembering the various toppings. Since these methods still create an instance of the class, you can also use other methods on the instances they create, such as `.add_topping()`:
+
+```python
+>>> a_pizza = Pizza.prosciutto()
+>>> a_pizza
+Pizza(['mozzarella', 'tomatoes', 'ham'])
+
+>>> a_pizza.add_topping("garlic")
+>>> a_pizza
+Pizza(['mozzarella', 'tomatoes', 'ham', 'garlic'])
+```
+
+Python only allows one `.__init__()` method per class, but it’s possible to add as many alternative constructors as necessary by using class methods. This can make the interface for your classes self-documenting and simplify their usage.
+
+So, when should you use class methods? In short, you should use class methods when you need to access and edit the data that’s tied to your class object rather than an instance of it. You can also use them to create alternative constructors for your class. **Use a class method when you need to access or modify class-level data or create factory methods that return class instances with specific configurations**.
 
 ### When to use Static Methods
 
+You can use static methods when you need utility functions that don’t access or modify class or instance data, but where the functionality they provide still logically belongs within the class’s namespace.
+
+Let’s stretch the pizza analogy even thinner, and add a static method that allows users to quickly fetch the diameter in inches based on common pizza sizes:
+```python
+class Pizza:
+    # ...
+
+    @staticmethod
+    def get_size_in_inches(size):
+        """Returns the diameter in inches for common pizza sizes."""
+        size_map = {
+            "small": 8,
+            "medium": 12,
+            "large": 16,
+        }
+        return size_map.get(size, "Unknown size")
+```
+
+The static method doesn’t have access to the instance or the class—and it doesn’t need that access. All that the method does is perform a dictionary lookup to return a number. You can call the static method both on a Pizza instance and the class itself:
+```python
+>>> from pizza import Pizza
+
+>>> a_pizza = Pizza(["mozzarella", "tomatoes"])
+>>> a_pizza.get_size_in_inches("medium")    # access by instance
+12
+
+>>> Pizza.get_size_in_inches("small")       # access by class
+8
+```
+
+It’s purely for convenience and organizational purposes that static methods are part of the namespaces of the class and the instance. That convenience can be helpful because as a programmer-turned-pizza-baker, you may still sometimes need to look up how large a specific size of pizza should be. With .get_size_in_inches(), you can do that quickly.
+
+So, when should you use static methods? **In short, you should use static methods when you need utility functionality that doesn’t need access to instance or class state or you should use static methods when you want to tie utility functionality related to your class right into its namespace**.
+
 ## Conclusion
+
+By now, you’ve seen that instance, class, and static methods each play a distinct role in designing maintainable, object-oriented Python code. When you use them intentionally, these three method types can improve your code’s clarity, reusability, and testability.
+
+- **Instance methods** encapsulate logic that operates on **individual objects**, giving you direct access to instance-specific state through `self`.
+- **Class methods** focus on **class-level concerns**, providing an elegant way to create factory methods and alternative constructors through `cls`.
+- **Static methods** act as **stand-alone utilities** that fit neatly within a class’s namespace.
+- Choosing the right method type helps **communicate developer intent** by clarifying which data each method cares about.
+- Using all three method types intentionally reduces bugs and improves maintainability by setting up **structured boundaries in class design**.
+
+The next time you design a Python class, take a moment to consider whether your methods need access to instance data, class data, or neither. If it makes sense, then place a decorator before your method definition to make your code both more readable and more robust.
